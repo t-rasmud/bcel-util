@@ -36,6 +36,8 @@ import org.checkerframework.checker.signature.qual.InternalForm;
 import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.reflection.Signatures;
 
+import org.checkerframework.checker.determinism.qual.*;
+
 /** Static utility methods for working with BCEL. */
 public final class BcelUtil {
   /** This class is a collection of methods; it does not represent anything. */
@@ -57,6 +59,7 @@ public final class BcelUtil {
    *
    * @return the major version of the Java runtime
    */
+  @SuppressWarnings("determinism:argument.type.incompatible") // NonDet system property
   private static int getJavaVersion() {
     String version = System.getProperty("java.version");
     if (version.startsWith("1.")) {
@@ -143,7 +146,7 @@ public final class BcelUtil {
   public static String instructionListToString(InstructionList il, ConstantPoolGen pool) {
 
     StringBuilder out = new StringBuilder();
-    for (Iterator<InstructionHandle> i = il.iterator(); i.hasNext(); ) {
+    for (@Det Iterator<InstructionHandle> i = il.iterator(); i.hasNext(); ) {
       InstructionHandle handle = i.next();
       out.append(handle.getInstruction().toString(pool.getConstantPool()) + "\n");
     }
@@ -160,7 +163,7 @@ public final class BcelUtil {
 
     StringBuilder out = new StringBuilder();
     out.append(String.format("Locals for %s [cnt %d]%n", mg, mg.getMaxLocals()));
-    LocalVariableGen[] lvgs = mg.getLocalVariables();
+    @Det LocalVariableGen[] lvgs = mg.getLocalVariables();
     if ((lvgs != null) && (lvgs.length > 0)) {
       for (LocalVariableGen lvg : lvgs) {
         out.append(String.format("  %s [index %d]%n", lvg, lvg.getIndex()));
@@ -338,7 +341,7 @@ public final class BcelUtil {
    * @return true iff the method is a main method
    */
   public static boolean isMain(MethodGen mg) {
-    Type[] argTypes = mg.getArgumentTypes();
+    @Det Type[] argTypes = mg.getArgumentTypes();
     return mg.isStatic()
         && (mg.getReturnType() == Type.VOID)
         && mg.getName().equals("main")
@@ -369,7 +372,7 @@ public final class BcelUtil {
       if (ilist == null || ilist.getStart() == null) {
         return;
       }
-      CodeExceptionGen[] exceptionHandlers = mgen.getExceptionHandlers();
+      @Det CodeExceptionGen[] exceptionHandlers = mgen.getExceptionHandlers();
       for (CodeExceptionGen gen : exceptionHandlers) {
         assert ilist.contains(gen.getStartPC())
             : "exception handler "
@@ -403,7 +406,7 @@ public final class BcelUtil {
       return;
     }
 
-    Method[] methods = gen.getMethods();
+    @Det Method[] methods = gen.getMethods();
     for (int i = 0; i < methods.length; i++) {
       Method method = methods[i];
       // System.out.println ("Checking method " + method + " in class "
@@ -423,7 +426,7 @@ public final class BcelUtil {
   /** Print the current java call stack. */
   public static void dumpStackTrace() {
 
-    StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+    @Det StackTraceElement[] ste = Thread.currentThread().getStackTrace();
     // [0] is getStackTrace
     // [1] is dumpStackTrace
     if (ste.length < 3) {
@@ -487,7 +490,7 @@ public final class BcelUtil {
 
       // Print the class, superclass, and interfaces
       p.printf("class %s extends %s%n", jc.getClassName(), jc.getSuperclassName());
-      String[] inames = jc.getInterfaceNames();
+      @Det String[] inames = jc.getInterfaceNames();
       boolean first = true;
       if ((inames != null) && (inames.length > 0)) {
         p.printf("   implements ");
@@ -522,7 +525,7 @@ public final class BcelUtil {
       // Print the details of the constant pool.
       p.printf("Constant Pool:%n");
       ConstantPool cp = jc.getConstantPool();
-      Constant[] constants = cp.getConstantPool();
+      @Det Constant[] constants = cp.getConstantPool();
       for (int ii = 0; ii < constants.length; ii++) {
         p.printf("  %d %s%n", ii, constants[ii]);
       }
@@ -596,9 +599,11 @@ public final class BcelUtil {
   public static void resetLocalsToFormals(MethodGen mg) {
 
     // Get the parameter types and names.
-    Type @SameLen({"argTypes", "mg.getArgumentTypes()"}) [] argTypes = mg.getArgumentTypes();
-    String @SameLen({"argTypes", "argNames", "mg.getArgumentTypes()", "mg.getArgumentNames()"}) []
-        argNames = mg.getArgumentNames();
+//    Type @SameLen({"argTypes", "mg.getArgumentTypes()"}) [] argTypes = mg.getArgumentTypes();
+//    String @SameLen({"argTypes", "argNames", "mg.getArgumentTypes()", "mg.getArgumentNames()"}) []
+//        argNames = mg.getArgumentNames();
+    @Det Type [] argTypes = mg.getArgumentTypes();
+    @Det String [] argNames = mg.getArgumentNames();
 
     // Remove any existing locals
     mg.setMaxLocals(0);
@@ -691,7 +696,7 @@ public final class BcelUtil {
     if (types.length == Integer.MAX_VALUE) {
       throw new Error("array " + Arrays.toString(types) + " is too large to extend");
     }
-    Type[] newTypes = new Type[types.length + 1];
+    @Det Type[] newTypes = new @Det Type[types.length + 1];
     System.arraycopy(types, 0, newTypes, 0, types.length);
     newTypes[types.length] = newType;
     return newTypes;
@@ -708,7 +713,7 @@ public final class BcelUtil {
     if (types.length == Integer.MAX_VALUE) {
       throw new Error("array " + Arrays.toString(types) + " is too large to extend");
     }
-    Type[] newTypes = new Type[types.length + 1];
+    @Det Type[] newTypes = new @Det Type[types.length + 1];
     System.arraycopy(types, 0, newTypes, 1, types.length);
     newTypes[0] = newType;
     return newTypes;

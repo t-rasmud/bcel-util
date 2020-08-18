@@ -20,6 +20,8 @@ import org.apache.bcel.generic.TABLESWITCH;
 import org.apache.bcel.verifier.structurals.OperandStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import org.checkerframework.checker.determinism.qual.*;
+
 /**
  * This class provides utility methods to maintain and modify a method's InstructionList within a
  * Java class file. It is a subclass of {@link org.plumelib.bcelutil.StackMapUtils} and thus handles
@@ -285,6 +287,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param start_ih InstructionHandle indicating first instruction to be deleted
    * @param end_ih InstructionHandle indicating last instruction to be deleted
    */
+  @SuppressWarnings("determinism:nondeterministic.tostring")  // Potential true positive; InstructionTargeter doesn't override tostring
   protected final void delete_instructions(
       MethodGen mg, InstructionHandle start_ih, InstructionHandle end_ih) {
     InstructionList il = mg.getInstructionList();
@@ -347,7 +350,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    */
   protected final StackMapType[] calculate_live_local_types(MethodGen mg, int location) {
     int max_local_index = -1;
-    StackMapType[] local_map_types = new StackMapType[mg.getMaxLocals()];
+    @Det StackMapType[] local_map_types = new @Det StackMapType[mg.getMaxLocals()];
     Arrays.fill(local_map_types, new StackMapType(Const.ITEM_Bogus, -1, pool.getConstantPool()));
     for (LocalVariableGen lv : mg.getLocalVariables()) {
       if (location >= lv.getStart().getPosition()) {
@@ -370,7 +373,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    */
   protected final StackMapType[] calculate_live_stack_types(OperandStack stack) {
     int ss = stack.size();
-    StackMapType[] stack_map_types = new StackMapType[ss];
+    @Det StackMapType[] stack_map_types = new StackMapType[ss];
     for (int ii = 0; ii < ss; ii++) {
       stack_map_types[ii] = generate_StackMapType_from_Type(stack.peek(ss - ii - 1));
     }
@@ -386,6 +389,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param ih InstructionHandle indicating where to insert new code
    * @param new_il InstructionList holding the new code
    */
+  @SuppressWarnings("determinism:nondeterministic.tostring")  // Potential true positive; InstructionTargeter doesn't override tostring
   protected final void replace_instructions(
       MethodGen mg, InstructionList il, InstructionHandle ih, @Nullable InstructionList new_il) {
 
@@ -489,7 +493,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
         // This situation is caused by a call to "instrument_object_call".
         InstructionHandle nih = new_start;
         int target_count = 0;
-        int target_offsets[] = new int[2]; // see note below for why '2'
+        @Det int target_offsets[] = new @Det int[2]; // see note below for why '2'
 
         // Any targeters on the first instruction will be from 'outside'
         // the new il so we start with the second instruction. (We already
@@ -518,7 +522,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
           // written to allow more.
           int cur_loc = new_start.getPosition();
           int orig_size = stack_map_table.length;
-          StackMapEntry[] new_stack_map_table = new StackMapEntry[orig_size + target_count];
+          @Det StackMapEntry[] new_stack_map_table = new @Det StackMapEntry[orig_size + target_count];
 
           // Calculate the operand stack value(s) for revised code.
           mg.setMaxStack();
@@ -596,7 +600,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
             if (number_extra_locals == 0 && stack.size() == 1 && !need_full_maps) {
               // the simple case
               StackMapType stack_map_type0 = generate_StackMapType_from_Type(stack.peek(0));
-              StackMapType[] stack_map_types0 = {stack_map_type0};
+              @Det StackMapType[] stack_map_types0 = {stack_map_type0};
               new_stack_map_table[new_index + i] =
                   new StackMapEntry(
                       Const.SAME_LOCALS_1_STACK_ITEM_FRAME,

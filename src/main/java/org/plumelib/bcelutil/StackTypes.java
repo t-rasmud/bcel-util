@@ -12,6 +12,8 @@ import org.checkerframework.checker.index.qual.SameLen;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
+import org.checkerframework.checker.determinism.qual.*;
+
 /**
  * Stores the types on the stack at each instruction (identified by byte code offset) in a method.
  */
@@ -21,7 +23,7 @@ public final class StackTypes {
    * The state of the operand stack at each instruction location. The instruction's byte code offset
    * is used as the index.
    */
-  OperandStack @SameLen("loc_arr") [] os_arr;
+  @Det OperandStack @SameLen("loc_arr") [] os_arr;
 
   /**
    * The state of the live local variables at each instruction location. The instruction's byte code
@@ -68,7 +70,7 @@ public final class StackTypes {
     return os_arr[offset];
   }
 
-  @SuppressWarnings({"allcheckers:purity", "lock"}) // local StringBuilder
+  @SuppressWarnings({"allcheckers:purity", "lock","determinism:argument.type.incompatible"}) // local StringBuilder
   @SideEffectFree
   @Override
   public String toString(@GuardSatisfied StackTypes this) {

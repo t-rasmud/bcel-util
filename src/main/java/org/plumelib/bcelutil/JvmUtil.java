@@ -8,6 +8,8 @@ import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.checker.signature.qual.FieldDescriptor;
 import org.checkerframework.checker.signature.qual.PrimitiveType;
 
+import org.checkerframework.checker.determinism.qual.*;
+
 /**
  * Utility functions for working with the JVM.
  *
@@ -21,7 +23,7 @@ import org.checkerframework.checker.signature.qual.PrimitiveType;
 public final class JvmUtil {
 
   /** A map from Java primitive type name (such as "int") to field descriptor (such as "I"). */
-  private static HashMap<@PrimitiveType String, @FieldDescriptor String>
+  private static @OrderNonDet HashMap<@PrimitiveType String, @FieldDescriptor String>
       primitiveToFieldDescriptor = new HashMap<>(8);
 
   static {
@@ -138,7 +140,7 @@ public final class JvmUtil {
   }
 
   /** A map from field descriptor (sach as "I") to Java primitive type (such as "int"). */
-  private static HashMap<String, String> fieldDescriptorToPrimitive = new HashMap<>(8);
+  private static @OrderNonDet HashMap<String, String> fieldDescriptorToPrimitive = new HashMap<>(8);
 
   static {
     fieldDescriptorToPrimitive.put("Z", "boolean");

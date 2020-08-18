@@ -52,6 +52,8 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import org.checkerframework.checker.determinism.qual.*;
+
 /**
  * This is a slightly modified version of Pass3bVerifier from BCEL. It uses NoConstaintsVisitor as
  * InstConstraintVisitor appears to be quite out of date and incorrectly fails on many valid class
@@ -199,6 +201,7 @@ public final class StackVer {
    * put [back] into the queue [as if they were unvisited]. The proof of termination is about the
    * existence of a fix point of frame merging.
    */
+  @SuppressWarnings("determinism:argument.type.incompatible")  // call to Randon
   private void circulationPump(
       final MethodGen m,
       final ControlFlowGraph cfg,
@@ -207,7 +210,7 @@ public final class StackVer {
       final InstConstraintVisitor icv,
       final ExecutionVisitor ev) {
     final Random random = new Random();
-    final InstructionContextQueue icq = new InstructionContextQueue();
+    final @Det InstructionContextQueue icq = new InstructionContextQueue();
 
     execute(start, vanillaFrame, new ArrayList<InstructionContext>(), icv, ev);
     // new ArrayList() <=>    no Instruction was executed before
@@ -289,7 +292,7 @@ public final class StackVer {
       } else { // "not a ret"
 
         // Normal successors. Add them to the queue of successors.
-        final InstructionContext[] succs = u.getSuccessors();
+        final @Det InstructionContext[] succs = u.getSuccessors();
         for (final InstructionContext v : succs) {
           if (execute(v, u.getOutFrame(oldchain), newchain, icv, ev)) {
             @SuppressWarnings(
@@ -303,7 +306,7 @@ public final class StackVer {
 
       // Exception Handlers. Add them to the queue of successors.
       // [subroutines are never protected; mandated by JustIce]
-      final ExceptionHandler[] exc_hds = u.getExceptionHandlers();
+      final @Det ExceptionHandler[] exc_hds = u.getExceptionHandlers();
       for (final ExceptionHandler exc_hd : exc_hds) {
         final InstructionContext v = cfg.contextOf(exc_hd.getHandlerStart());
         // TODO: the "oldchain" and "newchain" is used to determine the subroutine
@@ -476,7 +479,7 @@ public final class StackVer {
             f.getLocals().set(0, new ObjectType(mg.getClassName()));
           }
         }
-        final Type[] argtypes = mg.getArgumentTypes();
+        final @Det Type[] argtypes = mg.getArgumentTypes();
         int twoslotoffset = 0;
         for (int j = 0; j < argtypes.length; j++) {
           if (argtypes[j] == Type.SHORT

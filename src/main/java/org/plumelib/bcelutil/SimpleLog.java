@@ -5,6 +5,8 @@ import java.util.List;
 import org.checkerframework.checker.formatter.qual.FormatMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import org.checkerframework.checker.determinism.qual.Det;
+
 /**
  * A logging class with the following features:
  *
@@ -66,6 +68,7 @@ public final class SimpleLog {
    * @param args values to be substituted into format
    */
   @FormatMethod
+  @SuppressWarnings("determinism:nondeterministic.tostring")
   public void log(String format, @Nullable Object... args) {
     if (enabled) {
       System.out.print(getIndentString());
@@ -78,7 +81,7 @@ public final class SimpleLog {
     if (enabled) {
       Throwable t = new Throwable();
       t.fillInStackTrace();
-      StackTraceElement[] ste_arr = t.getStackTrace();
+      @Det StackTraceElement[] ste_arr = t.getStackTrace();
       for (int ii = 2; ii < ste_arr.length; ii++) {
         StackTraceElement ste = ste_arr[ii];
         System.out.printf("%s  %s%n", getIndentString(), ste);
