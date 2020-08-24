@@ -7,6 +7,8 @@ import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.checker.signature.qual.FieldDescriptor;
 import org.checkerframework.checker.signature.qual.PrimitiveType;
+import org.checkerframework.checker.determinism.qual.*;
+import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /**
  * Utility functions for working with the JVM.
@@ -18,11 +20,12 @@ import org.checkerframework.checker.signature.qual.PrimitiveType;
  *     href="http://plumelib.org/reflection-util/api/org/plumelib/reflection/Signatures.html">org.plumelib.reflection.Signatures</a>
  */
 @Deprecated
+@HasQualifierParameter(NonDet.class)
 public final class JvmUtil {
 
   /** A map from Java primitive type name (such as "int") to field descriptor (such as "I"). */
-  private static HashMap<@PrimitiveType String, @FieldDescriptor String>
-      primitiveToFieldDescriptor = new HashMap<>(8);
+  private static @OrderNonDet HashMap<@PrimitiveType String, @FieldDescriptor String>
+      primitiveToFieldDescriptor = new @OrderNonDet HashMap<>(8);
 
   static {
     primitiveToFieldDescriptor.put("boolean", "Z");
@@ -45,7 +48,7 @@ public final class JvmUtil {
    * @param classname name of the class, in binary class name format
    * @return name of the class, in field descriptor format
    */
-  @SuppressWarnings("signature") // conversion routine
+  @SuppressWarnings({"signature","determinism:method.invocation.invalid","determinism:return.type.incompatible"}) // conversion routine
   public static @FieldDescriptor String binaryNameToFieldDescriptor(@BinaryName String classname) {
     int dimensions = 0;
     String sansArray = classname;
@@ -71,6 +74,7 @@ public final class JvmUtil {
    * @return name of the type, in field descriptor format
    * @throws IllegalArgumentException if primitiveName is not a valid primitive type name
    */
+  @SuppressWarnings({"determinism:method.invocation.invalid","determinism:throw.type.invalod","determinism:return.type.incompatible"})
   public static @FieldDescriptor String primitiveTypeNameToFieldDescriptor(String primitiveName) {
     String result = primitiveToFieldDescriptor.get(primitiveName);
     if (result == null) {
@@ -120,6 +124,7 @@ public final class JvmUtil {
    * @param arglist an argument list, in Java format
    * @return argument list, in JVML format
    */
+  @SuppressWarnings("determinism:throw.type.invalod")
   public static String arglistToJvm(String arglist) {
     if (!(arglist.startsWith("(") && arglist.endsWith(")"))) {
       throw new Error("Malformed arglist: " + arglist);
@@ -138,7 +143,7 @@ public final class JvmUtil {
   }
 
   /** A map from field descriptor (sach as "I") to Java primitive type (such as "int"). */
-  private static HashMap<String, String> fieldDescriptorToPrimitive = new HashMap<>(8);
+  private static @OrderNonDet HashMap<String, String> fieldDescriptorToPrimitive = new @OrderNonDet HashMap<>(8);
 
   static {
     fieldDescriptorToPrimitive.put("Z", "boolean");
@@ -159,7 +164,7 @@ public final class JvmUtil {
    * @param classname name of the type, in JVML format
    * @return name of the type, in Java format
    */
-  @SuppressWarnings("signature") // conversion routine
+  @SuppressWarnings({"signature","determinism:method.invocation.invalid","determinism:return.type.incompatible"}) // conversion routine
   public static @BinaryName String fieldDescriptorToBinaryName(String classname) {
     if (classname.equals("")) {
       throw new Error("Empty string passed to fieldDescriptorToBinaryName");

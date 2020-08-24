@@ -11,6 +11,7 @@ import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.checker.index.qual.SameLen;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.checker.determinism.qual.*;
 
 /**
  * Stores the types on the stack at each instruction (identified by byte code offset) in a method.
@@ -64,7 +65,7 @@ public final class StackTypes {
    * @param offset the offset to which to get the stack contents
    * @return the stack at the (instruction at the) given offset
    */
-  public OperandStack get(@IndexFor({"loc_arr", "os_arr"}) int offset) {
+  public @PolyDet("up") OperandStack get(@IndexFor({"loc_arr", "os_arr"}) int offset) {
     return os_arr[offset];
   }
 

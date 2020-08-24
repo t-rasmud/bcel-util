@@ -19,6 +19,8 @@ import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.TABLESWITCH;
 import org.apache.bcel.verifier.structurals.OperandStack;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.determinism.qual.*;
+import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /**
  * This class provides utility methods to maintain and modify a method's InstructionList within a
@@ -108,6 +110,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * org.plumelib.bcelutil.BcelUtil} for notes on inspecting a Java class file.
  */
 @SuppressWarnings("nullness")
+@HasQualifierParameter(NonDet.class)
 public abstract class InstructionListUtils extends StackMapUtils {
 
   /**
@@ -345,10 +348,11 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param location the code location to be evaluated
    * @return an array of StackMapType describing the live locals at location
    */
+  @SuppressWarnings("determinism:argument.type.incompatible")
   protected final StackMapType[] calculate_live_local_types(MethodGen mg, int location) {
     int max_local_index = -1;
-    StackMapType[] local_map_types = new StackMapType[mg.getMaxLocals()];
-    Arrays.fill(local_map_types, new StackMapType(Const.ITEM_Bogus, -1, pool.getConstantPool()));
+    @PolyDet("use") StackMapType @PolyDet[] local_map_types = new @PolyDet("use") StackMapType @PolyDet[mg.getMaxLocals()];
+    Arrays.fill(local_map_types, new @PolyDet StackMapType(Const.ITEM_Bogus, -1, pool.getConstantPool()));
     for (LocalVariableGen lv : mg.getLocalVariables()) {
       if (location >= lv.getStart().getPosition()) {
         if (lv.getLiveToEnd() || location < lv.getEnd().getPosition()) {
@@ -370,7 +374,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    */
   protected final StackMapType[] calculate_live_stack_types(OperandStack stack) {
     int ss = stack.size();
-    StackMapType[] stack_map_types = new StackMapType[ss];
+    @PolyDet("use") StackMapType @PolyDet[] stack_map_types = new @PolyDet("use") StackMapType @PolyDet[ss];
     for (int ii = 0; ii < ss; ii++) {
       stack_map_types[ii] = generate_StackMapType_from_Type(stack.peek(ss - ii - 1));
     }
@@ -386,6 +390,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param ih InstructionHandle indicating where to insert new code
    * @param new_il InstructionList holding the new code
    */
+  @SuppressWarnings({"determinism:invalid.array.component.type","determinism:argument.type.incompatible","determinism:assignment.type.incompatible","determinism:method.invocation.invalid","determinism:array.initializer.type.incompatible"})
   protected final void replace_instructions(
       MethodGen mg, InstructionList il, InstructionHandle ih, @Nullable InstructionList new_il) {
 
@@ -489,7 +494,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
         // This situation is caused by a call to "instrument_object_call".
         InstructionHandle nih = new_start;
         int target_count = 0;
-        int target_offsets[] = new int[2]; // see note below for why '2'
+        @PolyDet("use") int target_offsets @PolyDet[] = new @PolyDet("use") int @PolyDet[2]; // see note below for why '2'
 
         // Any targeters on the first instruction will be from 'outside'
         // the new il so we start with the second instruction. (We already
@@ -518,7 +523,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
           // written to allow more.
           int cur_loc = new_start.getPosition();
           int orig_size = stack_map_table.length;
-          StackMapEntry[] new_stack_map_table = new StackMapEntry[orig_size + target_count];
+          @PolyDet("use") StackMapEntry @PolyDet[] new_stack_map_table = new @PolyDet("use") StackMapEntry @PolyDet[orig_size + target_count];
 
           // Calculate the operand stack value(s) for revised code.
           mg.setMaxStack();
@@ -596,7 +601,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
             if (number_extra_locals == 0 && stack.size() == 1 && !need_full_maps) {
               // the simple case
               StackMapType stack_map_type0 = generate_StackMapType_from_Type(stack.peek(0));
-              StackMapType[] stack_map_types0 = {stack_map_type0};
+              @PolyDet("use") StackMapType @PolyDet[] stack_map_types0 = {stack_map_type0};
               new_stack_map_table[new_index + i] =
                   new StackMapEntry(
                       Const.SAME_LOCALS_1_STACK_ITEM_FRAME,

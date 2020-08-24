@@ -35,8 +35,11 @@ import org.checkerframework.checker.signature.qual.FqBinaryName;
 import org.checkerframework.checker.signature.qual.InternalForm;
 import org.plumelib.reflection.ReflectionPlume;
 import org.plumelib.reflection.Signatures;
+import org.checkerframework.checker.determinism.qual.*;
+import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /** Static utility methods for working with BCEL. */
+@SuppressWarnings("NonDet.class")
 public final class BcelUtil {
   /** This class is a collection of methods; it does not represent anything. */
   private BcelUtil() {
@@ -57,6 +60,7 @@ public final class BcelUtil {
    *
    * @return the major version of the Java runtime
    */
+  @SuppressWarnings("determinism:return.type.incompatible")
   private static int getJavaVersion() {
     String version = System.getProperty("java.version");
     if (version.startsWith("1.")) {
@@ -143,7 +147,7 @@ public final class BcelUtil {
   public static String instructionListToString(InstructionList il, ConstantPoolGen pool) {
 
     StringBuilder out = new StringBuilder();
-    for (Iterator<InstructionHandle> i = il.iterator(); i.hasNext(); ) {
+    for (Iterator<@PolyDet("use") InstructionHandle> i = il.iterator(); i.hasNext(); ) {
       InstructionHandle handle = i.next();
       out.append(handle.getInstruction().toString(pool.getConstantPool()) + "\n");
     }
@@ -337,7 +341,7 @@ public final class BcelUtil {
    * @param mg the method to check
    * @return true iff the method is a main method
    */
-  public static boolean isMain(MethodGen mg) {
+  public static @PolyDet("up") boolean isMain(MethodGen mg) {
     Type[] argTypes = mg.getArgumentTypes();
     return mg.isStatic()
         && (mg.getReturnType() == Type.VOID)
@@ -423,7 +427,7 @@ public final class BcelUtil {
   /** Print the current java call stack. */
   public static void dumpStackTrace() {
 
-    StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+    @Det StackTraceElement @Det[] ste = Thread.currentThread().getStackTrace();
     // [0] is getStackTrace
     // [1] is dumpStackTrace
     if (ste.length < 3) {
@@ -448,6 +452,7 @@ public final class BcelUtil {
    *
    * @param gen the class whose methods to print
    */
+  @SuppressWarnings("determinism:argument.type.incompatible")
   static void dumpMethods(ClassGen gen) {
 
     System.out.printf("Class %s methods:%n", gen.getClassName());
@@ -478,6 +483,7 @@ public final class BcelUtil {
    * @param jc JavaClass to dump
    * @param dumpDir directory in which to write the file
    */
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})
   public static void dump(JavaClass jc, File dumpDir) {
 
     try {
@@ -593,6 +599,7 @@ public final class BcelUtil {
    *
    * @param mg the method whose locals to set
    */
+  @SuppressWarnings("determinism:annotation.type.incompatible")
   public static void resetLocalsToFormals(MethodGen mg) {
 
     // Get the parameter types and names.
@@ -691,7 +698,7 @@ public final class BcelUtil {
     if (types.length == Integer.MAX_VALUE) {
       throw new Error("array " + Arrays.toString(types) + " is too large to extend");
     }
-    Type[] newTypes = new Type[types.length + 1];
+    @PolyDet("use") Type @PolyDet[] newTypes = new @PolyDet("use") Type @PolyDet[types.length + 1];
     System.arraycopy(types, 0, newTypes, 0, types.length);
     newTypes[types.length] = newType;
     return newTypes;
@@ -708,7 +715,7 @@ public final class BcelUtil {
     if (types.length == Integer.MAX_VALUE) {
       throw new Error("array " + Arrays.toString(types) + " is too large to extend");
     }
-    Type[] newTypes = new Type[types.length + 1];
+    @PolyDet("use") Type @PolyDet[] newTypes = new @PolyDet("use") Type @PolyDet[types.length + 1];
     System.arraycopy(types, 0, newTypes, 1, types.length);
     newTypes[0] = newType;
     return newTypes;

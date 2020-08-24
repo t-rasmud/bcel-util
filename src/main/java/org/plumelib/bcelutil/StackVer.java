@@ -51,6 +51,7 @@ import org.apache.bcel.verifier.structurals.UninitializedObjectType;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.determinism.qual.*;
 
 /**
  * This is a slightly modified version of Pass3bVerifier from BCEL. It uses NoConstaintsVisitor as
@@ -120,6 +121,7 @@ public final class StackVer {
      *
      * @param i the index of the items to be removed
      */
+    @SuppressWarnings("determinism:method.invocation.invalid")
     public void remove(final @NonNegative int i) {
       ics.remove(i);
       ecs.remove(i);
@@ -131,6 +133,7 @@ public final class StackVer {
      * @param i the index of the item to be fetched
      * @return the indicated InstructionContext
      */
+    @SuppressWarnings("determinism:return.type.incompatible")
     public InstructionContext getIC(final @NonNegative int i) {
       return ics.get(i);
     }
@@ -141,6 +144,7 @@ public final class StackVer {
      * @param i the index of the item to be fetched
      * @return the indicated ExecutionChain
      */
+    @SuppressWarnings("determinism:return.type.incompatible")
     public ArrayList<InstructionContext> getEC(final @NonNegative int i) {
       return ecs.get(i);
     }
@@ -199,6 +203,7 @@ public final class StackVer {
    * put [back] into the queue [as if they were unvisited]. The proof of termination is about the
    * existence of a fix point of frame merging.
    */
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:assignment.type.incompatible"})
   private void circulationPump(
       final MethodGen m,
       final ControlFlowGraph cfg,
@@ -207,12 +212,12 @@ public final class StackVer {
       final InstConstraintVisitor icv,
       final ExecutionVisitor ev) {
     final Random random = new Random();
-    final InstructionContextQueue icq = new InstructionContextQueue();
+    final @PolyDet InstructionContextQueue icq = new @PolyDet InstructionContextQueue();
 
-    execute(start, vanillaFrame, new ArrayList<InstructionContext>(), icv, ev);
+    execute(start, vanillaFrame, new @PolyDet ArrayList<InstructionContext>(), icv, ev);
     // new ArrayList() <=>    no Instruction was executed before
     //                                    => Top-Level routine (no jsr call before)
-    icq.add(start, new ArrayList<InstructionContext>());
+    icq.add(start, new @PolyDet ArrayList<InstructionContext>());
 
     // LOOP!
     while (!icq.isEmpty()) {
@@ -342,7 +347,7 @@ public final class StackVer {
         final InstructionContext ic = cfg.contextOf(ih);
         // TODO: This is buggy, we check only the top-level return instructions this way.
         // Maybe some maniac returns from a method when in a subroutine?
-        final Frame f = ic.getOutFrame(new ArrayList<InstructionContext>());
+        final Frame f = ic.getOutFrame(new @PolyDet ArrayList<InstructionContext>());
         final LocalVariables lvs = f.getLocals();
         for (int i = 0; i < lvs.maxLocals(); i++) {
           if (lvs.get(i) instanceof UninitializedObjectType) {

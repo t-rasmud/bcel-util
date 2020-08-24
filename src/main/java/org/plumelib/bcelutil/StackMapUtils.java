@@ -32,6 +32,8 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.dataflow.qual.Pure;
+import org.checkerframework.checker.determinism.qual.*;
+import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /**
  * This class provides utility methods to maintain and modify a method's StackMapTable within a Java
@@ -46,6 +48,7 @@ import org.checkerframework.dataflow.qual.Pure;
  * would not normally extend this class directly.
  */
 @SuppressWarnings("nullness")
+@HasQualifierParameter(NonDet.class)
 public abstract class StackMapUtils {
 
   /*
@@ -119,7 +122,7 @@ public abstract class StackMapUtils {
    * A map from instructions that create uninitialized NEW objects to the corresponding StackMap
    * entry. Set by build_unitialized_NEW_map.
    */
-  private Map<InstructionHandle, Integer> uninitialized_NEW_map = new HashMap<>();
+  private @PolyDet("upDet") Map<InstructionHandle, Integer> uninitialized_NEW_map = new @PolyDet("upDet") HashMap<>();
 
   /**
    * Returns a String array with new_string added to the end of arr.
@@ -128,8 +131,9 @@ public abstract class StackMapUtils {
    * @param new_string string to be added
    * @return the new string array
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected String[] add_string(String[] arr, String new_string) {
-    String[] new_arr = new String[arr.length + 1];
+    @PolyDet("use") String @PolyDet[] new_arr = new @PolyDet("use") String @PolyDet[arr.length + 1];
     for (int ii = 0; ii < arr.length; ii++) {
       new_arr[ii] = arr[ii];
     }
@@ -180,6 +184,7 @@ public abstract class StackMapUtils {
    * @return the StackMapTable attribute for the method (or null if not present)
    */
   @Pure
+  @SuppressWarnings("determinism:return.type.incompatible")
   protected final @Nullable Attribute get_stack_map_table_attribute(MethodGen mgen) {
     for (Attribute a : mgen.getCodeAttributes()) {
       if (is_stack_map_table(a)) {
@@ -196,6 +201,7 @@ public abstract class StackMapUtils {
    * @return the LocalVariableTypeTable attribute for the method (or null if not present)
    */
   @Pure
+  @SuppressWarnings("determinism:return.type.incompatible")
   protected final @Nullable Attribute get_local_variable_type_table_attribute(MethodGen mgen) {
     for (Attribute a : mgen.getCodeAttributes()) {
       if (is_local_variable_type_table(a)) {
@@ -223,6 +229,7 @@ public abstract class StackMapUtils {
    * @param position the location of insertion
    * @param delta the size of the insertion
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final void update_stack_map_offset(int position, int delta) {
 
     running_offset = -1; // no +1 on first entry
@@ -244,6 +251,7 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry
    */
+  @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:return.type.incompatible"})
   protected final StackMapEntry find_stack_map_equal(int offset) {
 
     running_offset = -1; // no +1 on first entry
@@ -271,6 +279,7 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry index
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final int find_stack_map_index_before(int offset) {
 
     number_active_locals = initial_locals_count;
@@ -316,6 +325,7 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry index
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final @IndexOrLow("stack_map_table") int find_stack_map_index_after(int offset) {
 
     running_offset = -1; // no +1 on first entry
@@ -385,6 +395,7 @@ public abstract class StackMapUtils {
    * @param offset compiler assigned local offset of hidden temp
    * @return offset incremented by size of smallest temp found at offset
    */
+  @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:argument.type.incompatible"})
   protected final int gen_temp_locals(MethodGen mgen, int offset) {
     int live_start = 0;
     Type live_type = null;
@@ -398,7 +409,7 @@ public abstract class StackMapUtils {
     int min_size = 3; // only sizes are 1 or 2; start with something larger.
 
     number_active_locals = initial_locals_count;
-    StackMapType[] types_of_active_locals = new StackMapType[number_active_locals];
+    @PolyDet("use") StackMapType @PolyDet[] types_of_active_locals = new @PolyDet("use") StackMapType @PolyDet[number_active_locals];
     for (int ii = 0; ii < number_active_locals; ii++) {
       types_of_active_locals[ii] = initial_type_list[ii];
       locals_offset_height += getSize(initial_type_list[ii]);
@@ -427,7 +438,7 @@ public abstract class StackMapUtils {
       } else if (frame_type == Const.FULL_FRAME) {
         locals_offset_height = 0;
         number_active_locals = 0;
-        types_of_active_locals = new StackMapType[smte.getNumberOfLocals()];
+        types_of_active_locals = new @PolyDet("use") StackMapType @PolyDet[smte.getNumberOfLocals()];
         for (StackMapType smt : smte.getTypesOfLocals()) {
           types_of_active_locals[number_active_locals++] = smt;
           locals_offset_height += getSize(smt);
@@ -612,11 +623,12 @@ public abstract class StackMapUtils {
    *
    * @param il instruction list to search
    */
+  @SuppressWarnings("determinism:argument.type.incompatible")
   protected final void update_uninitialized_NEW_offsets(InstructionList il) {
 
     il.setPositions();
 
-    for (Map.Entry<InstructionHandle, Integer> e : uninitialized_NEW_map.entrySet()) {
+    for (Map.@PolyDet Entry<InstructionHandle, Integer> e : uninitialized_NEW_map.entrySet()) {
       InstructionHandle ih = e.getKey();
       int old_offset = e.getValue().intValue();
       int new_offset = ih.getPosition();
@@ -694,6 +706,7 @@ public abstract class StackMapUtils {
    *     Java 1.7 (= classfile version 51)
    */
   @EnsuresNonNull({"stack_map_table"})
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final void set_current_stack_map_table(MethodGen mgen, int java_class_version) {
 
     needStackMap = false;
@@ -722,6 +735,7 @@ public abstract class StackMapUtils {
    *
    * @param prefix label to display with table
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final void print_stack_map_table(String prefix) {
 
     debug_instrument.log("%nStackMap(%s) %s items:%n", prefix, stack_map_table.length);
@@ -862,6 +876,7 @@ public abstract class StackMapUtils {
    * @param type_new_var type of new variable we are adding
    * @param locals a copy of the local variable table prior to this modification
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final void update_full_frame_stack_map_entries(
       int offset, Type type_new_var, LocalVariableGen[] locals) {
     @NonNegative int index; // locals index
@@ -870,8 +885,8 @@ public abstract class StackMapUtils {
       if (stack_map_table[i].getFrameType() == Const.FULL_FRAME) {
 
         int num_locals = stack_map_table[i].getNumberOfLocals();
-        StackMapType[] new_local_types = new StackMapType[num_locals + 1];
-        StackMapType[] old_local_types = stack_map_table[i].getTypesOfLocals();
+        @PolyDet("use") StackMapType @PolyDet[] new_local_types = new @PolyDet("use") StackMapType @PolyDet[num_locals + 1];
+        @PolyDet("up") StackMapType @PolyDet("up")[] old_local_types = stack_map_table[i].getTypesOfLocals();
 
         // System.out.printf ("update_full_frame %s %s %s %n", offset, num_locals, locals.length);
 
@@ -928,6 +943,7 @@ public abstract class StackMapUtils {
    * @param arg_type type of new parameter
    * @return a LocalVariableGen for the new parameter
    */
+  @SuppressWarnings("determinism:method.invocation.invalid")
   protected final LocalVariableGen add_new_parameter(
       MethodGen mgen, String arg_name, Type arg_type) {
     // We add a new parameter, after any current ones, and then
@@ -943,8 +959,8 @@ public abstract class StackMapUtils {
 
     LocalVariableGen arg_new = null;
     // get a copy of the locals before modification
-    LocalVariableGen[] locals = mgen.getLocalVariables();
-    Type[] arg_types = mgen.getArgumentTypes();
+    @PolyDet("use") LocalVariableGen @PolyDet[] locals = mgen.getLocalVariables();
+    @PolyDet("use") Type @PolyDet[] arg_types = mgen.getArgumentTypes();
     int new_index = 0;
     int new_offset = 0;
 
@@ -975,7 +991,7 @@ public abstract class StackMapUtils {
 
     // Update the method's parameter information.
     arg_types = BcelUtil.postpendToArray(arg_types, arg_type);
-    String[] arg_names = add_string(mgen.getArgumentNames(), arg_name);
+    @PolyDet("use") String @PolyDet[] arg_names = add_string(mgen.getArgumentNames(), arg_name);
     mgen.setArgumentTypes(arg_types);
     mgen.setArgumentNames(arg_names);
 
@@ -1019,6 +1035,7 @@ public abstract class StackMapUtils {
    * @param local_type type of new local
    * @return a LocalVariableGen for the new local
    */
+  @SuppressWarnings("determinism:method.invocation.invalid")
   protected final LocalVariableGen create_method_scope_local(
       MethodGen mgen, String local_name, Type local_type) {
     // BCEL sorts local vars and presents them in offset order.  Search
@@ -1043,7 +1060,7 @@ public abstract class StackMapUtils {
     int max_offset = 0;
     int new_offset = -1;
     // get a copy of the local before modification
-    LocalVariableGen[] locals = mgen.getLocalVariables();
+    @PolyDet("use") LocalVariableGen @PolyDet[] locals = mgen.getLocalVariables();
     @IndexOrLow("locals") int compiler_temp_i = -1;
     int new_index = -1;
     int i;
@@ -1148,6 +1165,7 @@ public abstract class StackMapUtils {
    *
    * @param mgen MethodGen to be modified
    */
+  @SuppressWarnings("determinism:assignment.type.incompatible")
   protected final void fix_local_variable_table(MethodGen mgen) {
     InstructionList il = mgen.getInstructionList();
     if (il == null) {
@@ -1276,6 +1294,7 @@ public abstract class StackMapUtils {
    * @param mg MethodGen for the method to be analyzed
    * @return a StackTypes object for the method
    */
+  @SuppressWarnings("determinism:argument.type.incompatible")
   protected final StackTypes bcel_calc_stack_types(MethodGen mg) {
 
     StackVer stackver = new StackVer();
