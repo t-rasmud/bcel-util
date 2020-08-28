@@ -70,7 +70,7 @@ public final class StackTypes {
   }
 
   @SuppressWarnings({"allcheckers:purity", "lock",  // local StringBuilder
-          "determinism:override.receiver.invalid"  // Bug in CF: formatting int is NonDet (https://github.com/t-rasmud/checker-framework/issues/201)
+          "determinism:override.receiver.invalid"  // https://github.com/t-rasmud/checker-framework/issues/201 Bug in CF: formatting int is NonDet
   })
   @SideEffectFree
   @Override

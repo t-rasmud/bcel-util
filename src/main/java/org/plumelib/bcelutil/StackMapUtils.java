@@ -25,6 +25,7 @@ import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.RET;
 import org.apache.bcel.generic.Type;
 import org.apache.bcel.verifier.VerificationResult;
+import org.checkerframework.checker.determinism.qual.*;
 import org.checkerframework.checker.index.qual.IndexOrLow;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.interning.qual.InternedDistinct;
@@ -32,7 +33,6 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.dataflow.qual.Pure;
-import org.checkerframework.checker.determinism.qual.*;
 import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /**
@@ -704,7 +704,7 @@ public abstract class StackMapUtils {
    *     Java 1.7 (= classfile version 51)
    */
   @EnsuresNonNull({"stack_map_table"})
-  @SuppressWarnings("determinism:assignment.type.incompatible")  // Copying a PolyDet collection
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Assigning a PolyDet collection to a PolyDet field
   protected final void set_current_stack_map_table(@Det StackMapUtils this, @Det MethodGen mgen, int java_class_version) {
 
     needStackMap = false;
