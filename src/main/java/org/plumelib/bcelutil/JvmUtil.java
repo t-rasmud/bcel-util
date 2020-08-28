@@ -48,8 +48,10 @@ public final class JvmUtil {
    * @param classname name of the class, in binary class name format
    * @return name of the class, in field descriptor format
    */
-  @SuppressWarnings({"signature","determinism:method.invocation.invalid","determinism:return.type.incompatible"}) // conversion routine
-  public static @FieldDescriptor String binaryNameToFieldDescriptor(@BinaryName String classname) {
+  @SuppressWarnings({"signature",  // conversion routine
+          "determinism:method.invocation.invalid"  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  })
+  public static @FieldDescriptor @NonDet String binaryNameToFieldDescriptor(@BinaryName String classname) {
     int dimensions = 0;
     String sansArray = classname;
     while (sansArray.endsWith("[]")) {
@@ -74,8 +76,8 @@ public final class JvmUtil {
    * @return name of the type, in field descriptor format
    * @throws IllegalArgumentException if primitiveName is not a valid primitive type name
    */
-  @SuppressWarnings({"determinism:method.invocation.invalid","determinism:return.type.incompatible"})
-  public static @FieldDescriptor String primitiveTypeNameToFieldDescriptor(String primitiveName) {
+  @SuppressWarnings({"determinism:method.invocation.invalid"})  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  public static @FieldDescriptor @NonDet String primitiveTypeNameToFieldDescriptor(String primitiveName) {
     String result = primitiveToFieldDescriptor.get(primitiveName);
     if (result == null) {
       throw new IllegalArgumentException("Not the name of a primitive type: " + primitiveName);
@@ -93,7 +95,7 @@ public final class JvmUtil {
    * @return the class name, in Class.getName format
    */
   @SuppressWarnings("signature") // conversion routine
-  public static @ClassGetName String binaryNameToClassGetName(@BinaryName String bn) {
+  public static @ClassGetName @NonDet String binaryNameToClassGetName(@BinaryName String bn) {
     if (bn.endsWith("[]")) {
       return binaryNameToFieldDescriptor(bn).replace('/', '.');
     } else {
@@ -108,7 +110,7 @@ public final class JvmUtil {
    * @return the class name, in Class.getName format
    */
   @SuppressWarnings("signature") // conversion routine
-  public static @ClassGetName String fieldDescriptorToClassGetName(@FieldDescriptor String fd) {
+  public static @ClassGetName @NonDet String fieldDescriptorToClassGetName(@FieldDescriptor String fd) {
     if (fd.startsWith("[")) {
       return fd.replace('/', '.');
     } else {
@@ -124,7 +126,7 @@ public final class JvmUtil {
    * @param arglist an argument list, in Java format
    * @return argument list, in JVML format
    */
-  public static String arglistToJvm(String arglist) {
+  public static @NonDet String arglistToJvm(String arglist) {
     if (!(arglist.startsWith("(") && arglist.endsWith(")"))) {
       throw new Error("Malformed arglist: " + arglist);
     }
@@ -163,8 +165,10 @@ public final class JvmUtil {
    * @param classname name of the type, in JVML format
    * @return name of the type, in Java format
    */
-  @SuppressWarnings({"signature","determinism:method.invocation.invalid","determinism:return.type.incompatible"}) // conversion routine
-  public static @BinaryName String fieldDescriptorToBinaryName(String classname) {
+  @SuppressWarnings({"signature",  // conversion routine
+          "determinism:method.invocation.invalid"  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  })
+  public static @BinaryName @NonDet String fieldDescriptorToBinaryName(String classname) {
     if (classname.equals("")) {
       throw new Error("Empty string passed to fieldDescriptorToBinaryName");
     }
@@ -198,7 +202,7 @@ public final class JvmUtil {
    * @param arglist an argument list, in JVML format
    * @return argument list, in Java format
    */
-  public static String arglistFromJvm(String arglist) {
+  public static @NonDet String arglistFromJvm(String arglist) {
     if (!(arglist.startsWith("(") && arglist.endsWith(")"))) {
       throw new Error("Malformed arglist: " + arglist);
     }
