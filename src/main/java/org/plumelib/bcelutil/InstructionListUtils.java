@@ -346,7 +346,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    *
    * @param mg MethodGen for the current method
    * @param location the code location to be evaluated
-   * @return an array of StackMapType describing the live locals at location
+   * @return an array fof StackMapType describing the live locals at location
    */
   @SuppressWarnings("determinism:argument.type.incompatible")
   protected final StackMapType[] calculate_live_local_types(MethodGen mg, int location) {

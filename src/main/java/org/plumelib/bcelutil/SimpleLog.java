@@ -93,7 +93,6 @@ public final class SimpleLog {
    *
    * @return the current indentation string x
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")
   private String getIndentString() {
     assert enabled;
     if (indentString == null) {

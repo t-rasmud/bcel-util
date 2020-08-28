@@ -53,15 +53,14 @@ public final class BcelUtil {
   private static final Type stringArray = Type.getType("[Ljava.lang.String;");
 
   /** The major version number of the Java runtime. */
-  public static final int javaVersion = getJavaVersion();
+  public static final @NonDet int javaVersion = getJavaVersion();
 
   /**
    * Extract the major version number from the "java.version" system property.
    *
    * @return the major version of the Java runtime
    */
-  @SuppressWarnings("determinism:return.type.incompatible")
-  private static int getJavaVersion() {
+  private static @NonDet int getJavaVersion() {
     String version = System.getProperty("java.version");
     if (version.startsWith("1.")) {
       // Up to Java 8, from a version string like "1.8.whatever", extract "8".
@@ -89,7 +88,7 @@ public final class BcelUtil {
    */
   public static String methodDeclarationToString(Method m) {
 
-    StringBuilder sb = new StringBuilder();
+    @PolyDet StringBuilder sb = new @PolyDet StringBuilder();
     String flags = accessFlagsToString(m);
     boolean argsExist = false;
     if (flags != null && !flags.isEmpty()) {
@@ -146,7 +145,7 @@ public final class BcelUtil {
    */
   public static String instructionListToString(InstructionList il, ConstantPoolGen pool) {
 
-    StringBuilder out = new StringBuilder();
+    @PolyDet StringBuilder out = new @PolyDet StringBuilder();
     for (Iterator<@PolyDet("use") InstructionHandle> i = il.iterator(); i.hasNext(); ) {
       InstructionHandle handle = i.next();
       out.append(handle.getInstruction().toString(pool.getConstantPool()) + "\n");
@@ -162,7 +161,7 @@ public final class BcelUtil {
    */
   public static String localVariablesToString(MethodGen mg) {
 
-    StringBuilder out = new StringBuilder();
+    @PolyDet StringBuilder out = new @PolyDet StringBuilder();
     out.append(String.format("Locals for %s [cnt %d]%n", mg, mg.getMaxLocals()));
     LocalVariableGen[] lvgs = mg.getLocalVariables();
     if ((lvgs != null) && (lvgs.length > 0)) {
@@ -452,7 +451,7 @@ public final class BcelUtil {
    *
    * @param gen the class whose methods to print
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Potential true positive; Printing methods in OrderNonDet order
   static void dumpMethods(ClassGen gen) {
 
     System.out.printf("Class %s methods:%n", gen.getClassName());
@@ -483,7 +482,7 @@ public final class BcelUtil {
    * @param jc JavaClass to dump
    * @param dumpDir directory in which to write the file
    */
-  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})  // Potential true positive of getInterfaceNames() returns OrderNonDet
   public static void dump(JavaClass jc, File dumpDir) {
 
     try {
@@ -599,7 +598,7 @@ public final class BcelUtil {
    *
    * @param mg the method whose locals to set
    */
-  @SuppressWarnings("determinism:annotation.type.incompatible")
+  @SuppressWarnings("determinism:annotation.type.incompatible")  // Ignore: array type of SameLen values is NonDet
   public static void resetLocalsToFormals(MethodGen mg) {
 
     // Get the parameter types and names.

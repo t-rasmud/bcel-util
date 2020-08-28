@@ -69,12 +69,14 @@ public final class StackTypes {
     return os_arr[offset];
   }
 
-  @SuppressWarnings({"allcheckers:purity", "lock"}) // local StringBuilder
+  @SuppressWarnings({"allcheckers:purity", "lock",  // local StringBuilder
+          "determinism:method.invocation.invalid"  // formatting int is NonDet
+  })
   @SideEffectFree
   @Override
   public String toString(@GuardSatisfied StackTypes this) {
 
-    StringBuilder sb = new StringBuilder();
+    @PolyDet StringBuilder sb = new @PolyDet StringBuilder();
 
     for (int i = 0; i < os_arr.length; i++) {
       if (os_arr[i] != null) {
