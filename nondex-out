@@ -1,0 +1,18 @@
+> Task :createCheckerFrameworkManifest UP-TO-DATE
+> Task :installGitHooks UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :nondexPrepare
+> Task :genOutJar
+> Task :compileTestJava NO-SOURCE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :nondexTest NO-SOURCE
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.1.1/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 688ms
+5 actionable tasks: 2 executed, 3 up-to-date
