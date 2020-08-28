@@ -482,7 +482,7 @@ public final class BcelUtil {
    * @param jc JavaClass to dump
    * @param dumpDir directory in which to write the file
    */
-  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})  // Potential true positive of getInterfaceNames() returns OrderNonDet
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})  // Potential true positive; Iteration of getInterfaceNames() returns OrderNonDet
   public static void dump(JavaClass jc, File dumpDir) {
 
     try {

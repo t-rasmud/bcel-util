@@ -131,7 +131,7 @@ public abstract class StackMapUtils {
    * @param new_string string to be added
    * @return the new string array
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for assigning into another
   protected String[] add_string(String[] arr, String new_string) {
     @PolyDet("use") String @PolyDet[] new_arr = new @PolyDet("use") String @PolyDet[arr.length + 1];
     for (int ii = 0; ii < arr.length; ii++) {
@@ -184,8 +184,7 @@ public abstract class StackMapUtils {
    * @return the StackMapTable attribute for the method (or null if not present)
    */
   @Pure
-  @SuppressWarnings("determinism:return.type.incompatible")
-  protected final @Nullable Attribute get_stack_map_table_attribute(MethodGen mgen) {
+  protected final @NonDet @Nullable Attribute get_stack_map_table_attribute(MethodGen mgen) {
     for (Attribute a : mgen.getCodeAttributes()) {
       if (is_stack_map_table(a)) {
         return a;
@@ -201,8 +200,7 @@ public abstract class StackMapUtils {
    * @return the LocalVariableTypeTable attribute for the method (or null if not present)
    */
   @Pure
-  @SuppressWarnings("determinism:return.type.incompatible")
-  protected final @Nullable Attribute get_local_variable_type_table_attribute(MethodGen mgen) {
+  protected final @NonDet @Nullable Attribute get_local_variable_type_table_attribute(MethodGen mgen) {
     for (Attribute a : mgen.getCodeAttributes()) {
       if (is_local_variable_type_table(a)) {
         return a;
@@ -229,7 +227,7 @@ public abstract class StackMapUtils {
    * @param position the location of insertion
    * @param delta the size of the insertion
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for updating another
   protected final void update_stack_map_offset(int position, int delta) {
 
     running_offset = -1; // no +1 on first entry
@@ -251,8 +249,8 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry
    */
-  @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:return.type.incompatible"})
-  protected final StackMapEntry find_stack_map_equal(int offset) {
+  @SuppressWarnings({"determinism:assignment.type.incompatible"})  // Iteration over a PolyDet collection for searching
+  protected final @NonDet StackMapEntry find_stack_map_equal(int offset) {
 
     running_offset = -1; // no +1 on first entry
     for (int i = 0; i < stack_map_table.length; i++) {
@@ -279,7 +277,7 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry index
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for searching
   protected final int find_stack_map_index_before(int offset) {
 
     number_active_locals = initial_locals_count;
@@ -325,7 +323,7 @@ public abstract class StackMapUtils {
    * @param offset byte code offset
    * @return the corresponding StackMapEntry index
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for searching
   protected final @IndexOrLow("stack_map_table") int find_stack_map_index_after(int offset) {
 
     running_offset = -1; // no +1 on first entry
@@ -395,7 +393,7 @@ public abstract class StackMapUtils {
    * @param offset compiler assigned local offset of hidden temp
    * @return offset incremented by size of smallest temp found at offset
    */
-  @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:argument.type.incompatible"})
+  @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:argument.type.incompatible"})  // Iteration over a PolyDet collection for assigning into another
   protected final int gen_temp_locals(MethodGen mgen, int offset) {
     int live_start = 0;
     Type live_type = null;
@@ -623,7 +621,7 @@ public abstract class StackMapUtils {
    *
    * @param il instruction list to search
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Iteration over a PolyDet collection for updation
   protected final void update_uninitialized_NEW_offsets(InstructionList il) {
 
     il.setPositions();
@@ -706,7 +704,7 @@ public abstract class StackMapUtils {
    *     Java 1.7 (= classfile version 51)
    */
   @EnsuresNonNull({"stack_map_table"})
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Copying a PolyDet collection
   protected final void set_current_stack_map_table(MethodGen mgen, int java_class_version) {
 
     needStackMap = false;
@@ -735,7 +733,7 @@ public abstract class StackMapUtils {
    *
    * @param prefix label to display with table
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Assigning element of a PolyDet collection to a PolyDet field
   protected final void print_stack_map_table(String prefix) {
 
     debug_instrument.log("%nStackMap(%s) %s items:%n", prefix, stack_map_table.length);
@@ -876,7 +874,7 @@ public abstract class StackMapUtils {
    * @param type_new_var type of new variable we are adding
    * @param locals a copy of the local variable table prior to this modification
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for assigning into another
   protected final void update_full_frame_stack_map_entries(
       int offset, Type type_new_var, LocalVariableGen[] locals) {
     @NonNegative int index; // locals index
@@ -943,7 +941,7 @@ public abstract class StackMapUtils {
    * @param arg_type type of new parameter
    * @return a LocalVariableGen for the new parameter
    */
-  @SuppressWarnings("determinism:method.invocation.invalid")
+  @SuppressWarnings("determinism:method.invocation.invalid")  // Calling update_full_frame_stack_map_entries with PolyDet(up) 'locals'
   protected final LocalVariableGen add_new_parameter(
       MethodGen mgen, String arg_name, Type arg_type) {
     // We add a new parameter, after any current ones, and then
@@ -1035,7 +1033,7 @@ public abstract class StackMapUtils {
    * @param local_type type of new local
    * @return a LocalVariableGen for the new local
    */
-  @SuppressWarnings("determinism:method.invocation.invalid")
+  @SuppressWarnings("determinism:method.invocation.invalid")  // Calling update_full_frame_stack_map_entries with PolyDet(up) 'locals'
   protected final LocalVariableGen create_method_scope_local(
       MethodGen mgen, String local_name, Type local_type) {
     // BCEL sorts local vars and presents them in offset order.  Search
@@ -1165,7 +1163,7 @@ public abstract class StackMapUtils {
    *
    * @param mgen MethodGen to be modified
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")
+  @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for assigning into another
   protected final void fix_local_variable_table(MethodGen mgen) {
     InstructionList il = mgen.getInstructionList();
     if (il == null) {
@@ -1294,7 +1292,7 @@ public abstract class StackMapUtils {
    * @param mg MethodGen for the method to be analyzed
    * @return a StackTypes object for the method
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Printing PolyDet values
   protected final StackTypes bcel_calc_stack_types(MethodGen mg) {
 
     StackVer stackver = new StackVer();

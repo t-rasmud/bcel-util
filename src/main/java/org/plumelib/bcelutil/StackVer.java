@@ -121,7 +121,7 @@ public final class StackVer {
      *
      * @param i the index of the items to be removed
      */
-    @SuppressWarnings("determinism:method.invocation.invalid")
+    @SuppressWarnings("determinism:method.invocation.invalid")  // Removing from a PolyDet list
     public void remove(final @NonNegative int i) {
       ics.remove(i);
       ecs.remove(i);
@@ -133,8 +133,7 @@ public final class StackVer {
      * @param i the index of the item to be fetched
      * @return the indicated InstructionContext
      */
-    @SuppressWarnings("determinism:return.type.incompatible")
-    public InstructionContext getIC(final @NonNegative int i) {
+    public @NonDet InstructionContext getIC(final @NonNegative int i) {
       return ics.get(i);
     }
 
@@ -144,8 +143,7 @@ public final class StackVer {
      * @param i the index of the item to be fetched
      * @return the indicated ExecutionChain
      */
-    @SuppressWarnings("determinism:return.type.incompatible")
-    public ArrayList<InstructionContext> getEC(final @NonNegative int i) {
+    public @PolyDet("up") ArrayList<InstructionContext> getEC(final @NonNegative int i) {
       return ecs.get(i);
     }
 
@@ -203,7 +201,7 @@ public final class StackVer {
    * put [back] into the queue [as if they were unvisited]. The proof of termination is about the
    * existence of a fix point of frame merging.
    */
-  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:assignment.type.incompatible"})
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:assignment.type.incompatible"})  // Iteration over a PolyDet collection for assigning into another
   private void circulationPump(
       final MethodGen m,
       final ControlFlowGraph cfg,
