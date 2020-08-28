@@ -121,7 +121,7 @@ public final class StackVer {
      *
      * @param i the index of the items to be removed
      */
-    @SuppressWarnings("determinism:method.invocation.invalid")  // Unsafe: Removing from a PolyDet list: {OrderNonDet Set<Det StackVer> st; @NonDet s = st.iterator().next(); st.remove()}
+    @SuppressWarnings("determinism:method.invocation.invalid")  // Potential true positive: Removing from a PolyDet list: {OrderNonDet Set<Det StackVer> st; @NonDet s = st.iterator().next(); st.remove()}
     public void remove(final @NonNegative int i) {
       ics.remove(i);
       ecs.remove(i);
