@@ -67,7 +67,7 @@ public final class SimpleLog {
    * @param args values to be substituted into format
    */
   @FormatMethod
-  @SuppressWarnings("determinism:nondeterministic.tostring")  //  Determinism checker cannot track when Object.toString is deterministic (https://github.com/t-rasmud/checker-framework/issues/198)
+  @SuppressWarnings("determinism:nondeterministic.tostring")  // Determinism checker cannot track when Object.toString is deterministic (https://github.com/t-rasmud/checker-framework/issues/198)
   public void log(@Det SimpleLog this, @Det String format, @Nullable @Det Object @Det... args) {
     if (enabled) {
       System.out.print(getIndentString());

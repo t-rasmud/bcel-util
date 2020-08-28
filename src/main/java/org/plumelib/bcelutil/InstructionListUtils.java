@@ -390,7 +390,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param ih InstructionHandle indicating where to insert new code
    * @param new_il InstructionList holding the new code
    */
-  @SuppressWarnings("determinism:nondeterministic.tostring")  //  Determinism checker cannot track when Object.toString is deterministic (https://github.com/t-rasmud/checker-framework/issues/198)
+  @SuppressWarnings("determinism:nondeterministic.tostring")  // Determinism checker cannot track when Object.toString is deterministic (https://github.com/t-rasmud/checker-framework/issues/198)
   protected final void replace_instructions(@Det InstructionListUtils this,
       @Det MethodGen mg, @Det InstructionList il, @Det InstructionHandle ih, @Nullable @Det InstructionList new_il) {
 
