@@ -74,7 +74,7 @@ public final class JvmUtil {
    * @return name of the type, in field descriptor format
    * @throws IllegalArgumentException if primitiveName is not a valid primitive type name
    */
-  @SuppressWarnings({"determinism:method.invocation.invalid","determinism:throw.type.invalod","determinism:return.type.incompatible"})
+  @SuppressWarnings({"determinism:method.invocation.invalid","determinism:return.type.incompatible"})
   public static @FieldDescriptor String primitiveTypeNameToFieldDescriptor(String primitiveName) {
     String result = primitiveToFieldDescriptor.get(primitiveName);
     if (result == null) {
@@ -124,7 +124,6 @@ public final class JvmUtil {
    * @param arglist an argument list, in Java format
    * @return argument list, in JVML format
    */
-  @SuppressWarnings("determinism:throw.type.invalod")
   public static String arglistToJvm(String arglist) {
     if (!(arglist.startsWith("(") && arglist.endsWith(")"))) {
       throw new Error("Malformed arglist: " + arglist);

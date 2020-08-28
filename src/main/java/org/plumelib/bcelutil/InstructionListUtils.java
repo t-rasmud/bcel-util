@@ -348,7 +348,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param location the code location to be evaluated
    * @return an array fof StackMapType describing the live locals at location
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Iteration over a PolyDet collection for assigning into another
   protected final StackMapType[] calculate_live_local_types(MethodGen mg, int location) {
     int max_local_index = -1;
     @PolyDet("use") StackMapType @PolyDet[] local_map_types = new @PolyDet("use") StackMapType @PolyDet[mg.getMaxLocals()];
@@ -390,7 +390,10 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param ih InstructionHandle indicating where to insert new code
    * @param new_il InstructionList holding the new code
    */
-  @SuppressWarnings({"determinism:invalid.array.component.type","determinism:argument.type.incompatible","determinism:assignment.type.incompatible","determinism:method.invocation.invalid","determinism:array.initializer.type.incompatible"})
+  @SuppressWarnings({"determinism:invalid.array.component.type",  // Cannot specify array type for stack_map_types0
+          "determinism:argument.type.incompatible",  // Printing mg.getClassName(): expected behavior
+          "determinism:assignment.type.incompatible"  // Assigning into PolyDet array
+  })
   protected final void replace_instructions(
       MethodGen mg, InstructionList il, InstructionHandle ih, @Nullable InstructionList new_il) {
 
