@@ -66,7 +66,7 @@ public final class SimpleLog {
    * @param args values to be substituted into format
    */
   @FormatMethod
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Printing PolyDet values
   public void log(String format, @Nullable Object... args) {
     if (enabled) {
       System.out.print(getIndentString());
@@ -75,7 +75,7 @@ public final class SimpleLog {
   }
 
   /** Print a stack trace to System.out. */
-  @SuppressWarnings("determinism:argument.type.incompatible")
+  @SuppressWarnings("determinism:argument.type.incompatible")  // Printing PolyDet values
   public void logStackTrace() {
     if (enabled) {
       Throwable t = new Throwable();
@@ -105,7 +105,7 @@ public final class SimpleLog {
   }
 
   /** Increases indentation by one level. */
-  @SuppressWarnings("determinism:unary.increment.type.incompatible")
+  @SuppressWarnings("determinism:unary.increment.type.incompatible")  // Safe to increment PolyDet int
   public void indent() {
     if (enabled) {
       indentLevel++;
@@ -114,7 +114,7 @@ public final class SimpleLog {
   }
 
   /** Decreases indentation by one level. */
-  @SuppressWarnings("determinism:unary.decrement.type.incompatible")
+  @SuppressWarnings("determinism:unary.decrement.type.incompatible")  // Safe to increment PolyDet int
   public void exdent() {
     if (enabled) {
       if (indentLevel == 0) {
