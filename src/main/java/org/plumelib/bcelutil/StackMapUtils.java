@@ -83,7 +83,7 @@ public abstract class StackMapUtils {
   protected boolean needStackMap = false;
 
   /** Working copy of StackMapTable; set by set_current_stack_map_table. */
-  protected StackMapEntry @Nullable [] stack_map_table = null;
+  protected @Det StackMapEntry @Nullable @Det[] stack_map_table = null;
 
   /** Original stack map table attribute; set by set_current_stack_map_table. */
   protected @Nullable StackMap smta = null;
@@ -394,7 +394,7 @@ public abstract class StackMapUtils {
    * @return offset incremented by size of smallest temp found at offset
    */
   @SuppressWarnings({"determinism:assignment.type.incompatible","determinism:argument.type.incompatible"})  // Iteration over a PolyDet collection for assigning into another
-  protected final int gen_temp_locals(MethodGen mgen, int offset) {
+  protected final @PolyDet("up") int gen_temp_locals(@Det StackMapUtils this, MethodGen mgen, int offset) {
     int live_start = 0;
     Type live_type = null;
     InstructionList il = mgen.getInstructionList();
@@ -414,7 +414,7 @@ public abstract class StackMapUtils {
     }
 
     // update state for each StackMap entry
-    for (StackMapEntry smte : stack_map_table) {
+    for (@Det StackMapEntry smte : stack_map_table) {
       int frame_type = smte.getFrameType();
       byte_code_offset += smte.getByteCodeOffset() + 1;
 
@@ -422,7 +422,7 @@ public abstract class StackMapUtils {
         // number to append is frame_type - 251
         types_of_active_locals =
             Arrays.copyOf(types_of_active_locals, number_active_locals + frame_type - 251);
-        for (StackMapType smt : smte.getTypesOfLocals()) {
+        for (@Det StackMapType smt : smte.getTypesOfLocals()) {
           types_of_active_locals[number_active_locals++] = smt;
           locals_offset_height += getSize(smt);
         }
@@ -690,7 +690,7 @@ public abstract class StackMapUtils {
    * @deprecated use {@link #set_current_stack_map_table}
    */
   @Deprecated // use set_current_stack_map_table() */
-  protected final void fetch_current_stack_map_table(MethodGen mgen, int java_class_version) {
+  protected final void fetch_current_stack_map_table(@Det StackMapUtils this, @Det MethodGen mgen, int java_class_version) {
     set_current_stack_map_table(mgen, java_class_version);
   }
 
@@ -705,7 +705,7 @@ public abstract class StackMapUtils {
    */
   @EnsuresNonNull({"stack_map_table"})
   @SuppressWarnings("determinism:assignment.type.incompatible")  // Copying a PolyDet collection
-  protected final void set_current_stack_map_table(MethodGen mgen, int java_class_version) {
+  protected final void set_current_stack_map_table(@Det StackMapUtils this, @Det MethodGen mgen, int java_class_version) {
 
     needStackMap = false;
     smta = (StackMap) get_stack_map_table_attribute(mgen);
@@ -733,8 +733,7 @@ public abstract class StackMapUtils {
    *
    * @param prefix label to display with table
    */
-  @SuppressWarnings("determinism:assignment.type.incompatible")  // Assigning element of a PolyDet collection to a PolyDet field
-  protected final void print_stack_map_table(String prefix) {
+  protected final void print_stack_map_table(@Det StackMapUtils this, @Det String prefix) {
 
     debug_instrument.log("%nStackMap(%s) %s items:%n", prefix, stack_map_table.length);
     running_offset = -1; // no +1 on first entry
@@ -750,7 +749,7 @@ public abstract class StackMapUtils {
    * @param mgen MethodGen to add attribute to
    * @throws IOException if cannot create the attribute
    */
-  protected final void create_new_stack_map_attribute(MethodGen mgen) throws IOException {
+  protected final void create_new_stack_map_attribute(@Det StackMapUtils this, MethodGen mgen) throws IOException {
 
     if (!needStackMap) {
       return;
@@ -924,8 +923,8 @@ public abstract class StackMapUtils {
    * @deprecated use {@link #add_new_parameter}
    */
   @Deprecated // use add_new_parameter()
-  protected final LocalVariableGen add_new_argument(
-      MethodGen mgen, String arg_name, Type arg_type) {
+  protected final LocalVariableGen add_new_argument(@Det StackMapUtils this,
+      @Det MethodGen mgen, @Det String arg_name, @Det Type arg_type) {
     return add_new_parameter(mgen, arg_name, arg_type);
   }
 
@@ -941,9 +940,8 @@ public abstract class StackMapUtils {
    * @param arg_type type of new parameter
    * @return a LocalVariableGen for the new parameter
    */
-  @SuppressWarnings("determinism:method.invocation.invalid")  // Calling update_full_frame_stack_map_entries with PolyDet(up) 'locals'
-  protected final LocalVariableGen add_new_parameter(
-      MethodGen mgen, String arg_name, Type arg_type) {
+  protected final LocalVariableGen add_new_parameter(@Det StackMapUtils this,
+      @Det MethodGen mgen, @Det String arg_name, @Det Type arg_type) {
     // We add a new parameter, after any current ones, and then
     // we need to make a pass over the byte codes to update the local
     // offset values of all the locals we just shifted up.  This may have
@@ -955,10 +953,10 @@ public abstract class StackMapUtils {
     // us) and the StackMapTable (yes - BCEL should do this, but it doesn't).
     //
 
-    LocalVariableGen arg_new = null;
+    @Det LocalVariableGen arg_new = null;
     // get a copy of the locals before modification
-    @PolyDet("use") LocalVariableGen @PolyDet[] locals = mgen.getLocalVariables();
-    @PolyDet("use") Type @PolyDet[] arg_types = mgen.getArgumentTypes();
+    @Det LocalVariableGen @Det[] locals = mgen.getLocalVariables();
+    @Det Type @Det[] arg_types = mgen.getArgumentTypes();
     int new_index = 0;
     int new_offset = 0;
 
@@ -989,7 +987,7 @@ public abstract class StackMapUtils {
 
     // Update the method's parameter information.
     arg_types = BcelUtil.postpendToArray(arg_types, arg_type);
-    @PolyDet("use") String @PolyDet[] arg_names = add_string(mgen.getArgumentNames(), arg_name);
+    @Det String @Det[] arg_names = add_string(mgen.getArgumentNames(), arg_name);
     mgen.setArgumentTypes(arg_types);
     mgen.setArgumentNames(arg_names);
 
@@ -1033,9 +1031,8 @@ public abstract class StackMapUtils {
    * @param local_type type of new local
    * @return a LocalVariableGen for the new local
    */
-  @SuppressWarnings("determinism:method.invocation.invalid")  // Calling update_full_frame_stack_map_entries with PolyDet(up) 'locals'
-  protected final LocalVariableGen create_method_scope_local(
-      MethodGen mgen, String local_name, Type local_type) {
+  protected final LocalVariableGen create_method_scope_local(@Det StackMapUtils this,
+      @Det MethodGen mgen, @Det String local_name, @Det Type local_type) {
     // BCEL sorts local vars and presents them in offset order.  Search
     // locals for first var with start != 0. If none, just add the new
     // var at the end of the table and exit. Otherwise, insert the new
@@ -1054,11 +1051,11 @@ public abstract class StackMapUtils {
     // for 'this' and/or the parameters so we need to add an explicit
     // check to make sure we skip these variables.
 
-    LocalVariableGen lv_new;
+    @Det LocalVariableGen lv_new;
     int max_offset = 0;
     int new_offset = -1;
     // get a copy of the local before modification
-    @PolyDet("use") LocalVariableGen @PolyDet[] locals = mgen.getLocalVariables();
+    @Det LocalVariableGen @Det[] locals = mgen.getLocalVariables();
     @IndexOrLow("locals") int compiler_temp_i = -1;
     int new_index = -1;
     int i;
@@ -1164,7 +1161,7 @@ public abstract class StackMapUtils {
    * @param mgen MethodGen to be modified
    */
   @SuppressWarnings("determinism:assignment.type.incompatible")  // Iteration over a PolyDet collection for assigning into another
-  protected final void fix_local_variable_table(MethodGen mgen) {
+  protected final void fix_local_variable_table(@Det StackMapUtils this, @Det MethodGen mgen) {
     InstructionList il = mgen.getInstructionList();
     if (il == null) {
       // no code so nothing to do
@@ -1175,7 +1172,7 @@ public abstract class StackMapUtils {
     // Get the current local variables (includes 'this' and parameters)
     LocalVariableGen[] locals = mgen.getLocalVariables();
     LocalVariableGen l;
-    LocalVariableGen new_lvg;
+    @Det LocalVariableGen new_lvg;
 
     // We need a deep copy
     for (int ii = 0; ii < locals.length; ii++) {
@@ -1242,7 +1239,7 @@ public abstract class StackMapUtils {
     //   the parameters to the method
     // This will be used to construct the initial state of the
     // StackMapTypes.
-    LocalVariableGen[] initial_locals = mgen.getLocalVariables();
+    @Det LocalVariableGen @Det[] initial_locals = mgen.getLocalVariables();
     initial_locals_count = initial_locals.length;
     initial_type_list = new StackMapType[initial_locals_count];
     for (int ii = 0; ii < initial_locals_count; ii++) {
@@ -1292,8 +1289,7 @@ public abstract class StackMapUtils {
    * @param mg MethodGen for the method to be analyzed
    * @return a StackTypes object for the method
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")  // Printing PolyDet values
-  protected final StackTypes bcel_calc_stack_types(MethodGen mg) {
+  protected final StackTypes bcel_calc_stack_types(@Det StackMapUtils this, @Det MethodGen mg) {
 
     StackVer stackver = new StackVer();
     VerificationResult vr;

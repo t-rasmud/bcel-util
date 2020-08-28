@@ -144,7 +144,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param mg MethodGen of method to be modified
    * @param new_il InstructionList holding the new code
    */
-  protected final void insert_at_method_start(MethodGen mg, InstructionList new_il) {
+  protected final void insert_at_method_start(@Det InstructionListUtils this, @Det MethodGen mg, @Det InstructionList new_il) {
 
     // Ignore methods with no instructions
     InstructionList il = mg.getInstructionList();
@@ -164,10 +164,10 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param new_il InstructionList holding the new code
    * @param redirect_branches flag indicating if branch targets should be moved from ih to new_il
    */
-  protected final void insert_before_handle(
-      MethodGen mg,
-      InstructionHandle ih,
-      @Nullable InstructionList new_il,
+  protected final void insert_before_handle(@Det InstructionListUtils this,
+      @Det MethodGen mg,
+      @Det InstructionHandle ih,
+      @Nullable @Det InstructionList new_il,
       boolean redirect_branches) {
 
     if (new_il == null) {
@@ -247,14 +247,14 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param start start of the instruction list
    * @param label a descriptive string for the instruction list
    */
-  private void print_il(InstructionHandle start, String label) {
+  private void print_il(@Det InstructionListUtils this, @Det InstructionHandle start, @Det String label) {
     if (debug_instrument.enabled()) {
       print_stack_map_table(label);
       InstructionHandle tih = start;
       while (tih != null) {
         debug_instrument.log("inst: %s %n", tih);
         if (tih.hasTargeters()) {
-          for (InstructionTargeter it : tih.getTargeters()) {
+          for (@Det InstructionTargeter it : tih.getTargeters()) {
             debug_instrument.log("targeter: %s %n", it);
           }
         }
@@ -390,12 +390,9 @@ public abstract class InstructionListUtils extends StackMapUtils {
    * @param ih InstructionHandle indicating where to insert new code
    * @param new_il InstructionList holding the new code
    */
-  @SuppressWarnings({"determinism:invalid.array.component.type",  // Cannot specify array type for stack_map_types0
-          "determinism:argument.type.incompatible",  // Printing mg.getClassName(): expected behavior
-          "determinism:assignment.type.incompatible"  // Assigning into PolyDet array
-  })
-  protected final void replace_instructions(
-      MethodGen mg, InstructionList il, InstructionHandle ih, @Nullable InstructionList new_il) {
+  @SuppressWarnings("determinism:nondeterministic.tostring")  //  Determinism checker cannot track when Object.toString is deterministic (https://github.com/t-rasmud/checker-framework/issues/198)
+  protected final void replace_instructions(@Det InstructionListUtils this,
+      @Det MethodGen mg, @Det InstructionList il, @Det InstructionHandle ih, @Nullable @Det InstructionList new_il) {
 
     if (new_il == null) {
       return;
@@ -448,7 +445,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
 
       // Move other targets to the new instuctions.
       if (ih.hasTargeters()) {
-        for (InstructionTargeter it : ih.getTargeters()) {
+        for (@Det InstructionTargeter it : ih.getTargeters()) {
           if (it instanceof LineNumberGen) {
             it.updateTarget(ih, new_start);
           } else if (it instanceof LocalVariableGen) {
@@ -497,7 +494,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
         // This situation is caused by a call to "instrument_object_call".
         InstructionHandle nih = new_start;
         int target_count = 0;
-        @PolyDet("use") int target_offsets @PolyDet[] = new @PolyDet("use") int @PolyDet[2]; // see note below for why '2'
+        @Det int target_offsets @Det[] = new @Det int @Det[2]; // see note below for why '2'
 
         // Any targeters on the first instruction will be from 'outside'
         // the new il so we start with the second instruction. (We already
@@ -526,12 +523,12 @@ public abstract class InstructionListUtils extends StackMapUtils {
           // written to allow more.
           int cur_loc = new_start.getPosition();
           int orig_size = stack_map_table.length;
-          @PolyDet("use") StackMapEntry @PolyDet[] new_stack_map_table = new @PolyDet("use") StackMapEntry @PolyDet[orig_size + target_count];
+          @Det StackMapEntry @Det[] new_stack_map_table = new @Det StackMapEntry @Det[orig_size + target_count];
 
           // Calculate the operand stack value(s) for revised code.
           mg.setMaxStack();
           OperandStack stack;
-          StackTypes stack_types = bcel_calc_stack_types(mg);
+          @Det StackTypes stack_types = bcel_calc_stack_types(mg);
           if (stack_types == null) {
             Error e =
                 new Error(
@@ -604,7 +601,7 @@ public abstract class InstructionListUtils extends StackMapUtils {
             if (number_extra_locals == 0 && stack.size() == 1 && !need_full_maps) {
               // the simple case
               StackMapType stack_map_type0 = generate_StackMapType_from_Type(stack.peek(0));
-              @PolyDet("use") StackMapType @PolyDet[] stack_map_types0 = {stack_map_type0};
+              @Det StackMapType @Det[] stack_map_types0 = new @Det StackMapType @Det[]{stack_map_type0};
               new_stack_map_table[new_index + i] =
                   new StackMapEntry(
                       Const.SAME_LOCALS_1_STACK_ITEM_FRAME,

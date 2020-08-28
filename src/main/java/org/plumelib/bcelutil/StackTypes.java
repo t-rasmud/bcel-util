@@ -70,15 +70,15 @@ public final class StackTypes {
   }
 
   @SuppressWarnings({"allcheckers:purity", "lock",  // local StringBuilder
-          "determinism:method.invocation.invalid"  // formatting int is NonDet
+          "determinism:override.receiver.invalid"  // Bug in CF: formatting int is NonDet (https://github.com/t-rasmud/checker-framework/issues/201)
   })
   @SideEffectFree
   @Override
-  public String toString(@GuardSatisfied StackTypes this) {
+  public String toString(@Det @GuardSatisfied StackTypes this) {
 
-    @PolyDet StringBuilder sb = new @PolyDet StringBuilder();
+    @Det StringBuilder sb = new @Det StringBuilder();
 
-    for (int i = 0; i < os_arr.length; i++) {
+    for (@Det int i = 0; i < os_arr.length; i++) {
       if (os_arr[i] != null) {
         sb.append(String.format("Instruction %d:\n", i));
         sb.append(String.format("  stack:  %s\n", toString(os_arr[i])));

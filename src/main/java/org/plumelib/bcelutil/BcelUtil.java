@@ -400,7 +400,7 @@ public final class BcelUtil {
    *
    * @param gen the class to check
    */
-  public static void checkMgens(final ClassGen gen) {
+  public static void checkMgens(final @Det ClassGen gen) {
 
     if (skipChecks) {
       return;
@@ -451,8 +451,7 @@ public final class BcelUtil {
    *
    * @param gen the class whose methods to print
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")  // Potential true positive; Printing methods in OrderNonDet order
-  static void dumpMethods(ClassGen gen) {
+  static void dumpMethods(@Det ClassGen gen) {
 
     System.out.printf("Class %s methods:%n", gen.getClassName());
     for (Method m : gen.getMethods()) {
@@ -469,9 +468,9 @@ public final class BcelUtil {
    * @param dumpDir directory in which to write the file
    * @see #dump(JavaClass, File)
    */
-  public static void dump(JavaClass jc, String dumpDir) {
+  public static void dump(@Det JavaClass jc, @Det String dumpDir) {
 
-    dump(jc, new File(dumpDir));
+    dump(jc, new @Det File(dumpDir));
   }
 
   /**
@@ -482,8 +481,7 @@ public final class BcelUtil {
    * @param jc JavaClass to dump
    * @param dumpDir directory in which to write the file
    */
-  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:method.invocation.invalid"})  // Potential true positive; Iteration of getInterfaceNames() returns OrderNonDet
-  public static void dump(JavaClass jc, File dumpDir) {
+  public static void dump(@Det JavaClass jc, @Det File dumpDir) {
 
     try {
       dumpDir.mkdir();
@@ -492,7 +490,7 @@ public final class BcelUtil {
 
       // Print the class, superclass, and interfaces
       p.printf("class %s extends %s%n", jc.getClassName(), jc.getSuperclassName());
-      String[] inames = jc.getInterfaceNames();
+      @Det String @Det[] inames = jc.getInterfaceNames();
       boolean first = true;
       if ((inames != null) && (inames.length > 0)) {
         p.printf("   implements ");
@@ -506,17 +504,17 @@ public final class BcelUtil {
 
       // Print each field
       p.printf("%nFields%n");
-      for (Field f : jc.getFields()) {
+      for (@Det Field f : jc.getFields()) {
         p.printf("  %s%n", f);
       }
 
       // Print the signature of each method
       p.printf("%nMethods%n");
-      for (Method m : jc.getMethods()) {
+      for (@Det Method m : jc.getMethods()) {
         p.printf("  %s%n", m);
       }
 
-      for (Method m : jc.getMethods()) {
+      for (@Det Method m : jc.getMethods()) {
         Code code = m.getCode();
         if (code != null) {
           p.printf("%nMethod %s%n", m);
@@ -527,7 +525,7 @@ public final class BcelUtil {
       // Print the details of the constant pool.
       p.printf("Constant Pool:%n");
       ConstantPool cp = jc.getConstantPool();
-      Constant[] constants = cp.getConstantPool();
+      @Det Constant @Det[] constants = cp.getConstantPool();
       for (int ii = 0; ii < constants.length; ii++) {
         p.printf("  %d %s%n", ii, constants[ii]);
       }
@@ -598,7 +596,7 @@ public final class BcelUtil {
    *
    * @param mg the method whose locals to set
    */
-  @SuppressWarnings("determinism:annotation.type.incompatible")  // Ignore: array type of SameLen values is NonDet
+  @SuppressWarnings("determinism:annotation.type.incompatible")  // Ignore - array type of SameLen values is NonDet
   public static void resetLocalsToFormals(MethodGen mg) {
 
     // Get the parameter types and names.
