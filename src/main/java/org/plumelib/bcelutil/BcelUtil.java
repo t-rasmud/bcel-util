@@ -596,7 +596,7 @@ public final class BcelUtil {
    *
    * @param mg the method whose locals to set
    */
-  @SuppressWarnings("determinism:annotation.type.incompatible")  // Irrelevant to determinism checker - array type of @SameLen values is NonDet
+  @SuppressWarnings("determinism:annotation.type.incompatible")  // Irrelevant to determinism checker: array type of @SameLen values is NonDet
   public static void resetLocalsToFormals(MethodGen mg) {
 
     // Get the parameter types and names.
