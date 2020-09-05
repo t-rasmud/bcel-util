@@ -2,12 +2,12 @@ package org.plumelib.bcelutil;
 
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import org.checkerframework.checker.determinism.qual.*;
 import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.checker.signature.qual.FieldDescriptor;
 import org.checkerframework.checker.signature.qual.PrimitiveType;
-import org.checkerframework.checker.determinism.qual.*;
 import org.checkerframework.framework.qual.HasQualifierParameter;
 
 /**
@@ -48,8 +48,9 @@ public final class JvmUtil {
    * @param classname name of the class, in binary class name format
    * @return name of the class, in field descriptor format
    */
-  @SuppressWarnings({"signature",  // conversion routine
-          "determinism:method.invocation.invalid"  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  @SuppressWarnings({
+    "signature", // conversion routine
+    "determinism:method.invocation.invalid" // cache lookup is PolyDet: primitiveToFieldDescriptor
   })
   public static @FieldDescriptor @NonDet String binaryNameToFieldDescriptor(@BinaryName String classname) {
     int dimensions = 0;
@@ -76,7 +77,7 @@ public final class JvmUtil {
    * @return name of the type, in field descriptor format
    * @throws IllegalArgumentException if primitiveName is not a valid primitive type name
    */
-  @SuppressWarnings({"determinism:method.invocation.invalid"})  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  @SuppressWarnings({"determinism:method.invocation.invalid"})  // cache lookup is PolyDet: primitiveToFieldDescriptor
   public static @FieldDescriptor @NonDet String primitiveTypeNameToFieldDescriptor(String primitiveName) {
     String result = primitiveToFieldDescriptor.get(primitiveName);
     if (result == null) {
@@ -165,8 +166,9 @@ public final class JvmUtil {
    * @param classname name of the type, in JVML format
    * @return name of the type, in Java format
    */
-  @SuppressWarnings({"signature",  // conversion routine
-          "determinism:method.invocation.invalid"  // Cannot declare 'primitiveToFieldDescriptor' as PolyDet
+  @SuppressWarnings({
+    "signature", // conversion routine
+    "determinism:method.invocation.invalid" // cache lookup is PolyDet: primitiveToFieldDescriptor
   })
   public static @BinaryName @NonDet String fieldDescriptorToBinaryName(String classname) {
     if (classname.equals("")) {
