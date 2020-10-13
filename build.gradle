@@ -2,7 +2,7 @@ plugins {
   id 'java-library'
 
   // To create a fat jar build/libs/bcel-util-all.jar, run: ./gradlew shadowJar
-  id 'com.github.johnrengelman.shadow' version '6.0.0'
+  id 'com.github.johnrengelman.shadow' version '6.1.0'
 
   // Formatting is disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
@@ -13,7 +13,7 @@ plugins {
   id("net.ltgt.errorprone") version "1.2.1"
 
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.5.9'
+  id 'org.checkerframework' version '0.5.11'
 
   // To show task list as a tree, run: ./gradlew <taskname> taskTree
   id 'com.dorongold.task-tree' version '1.5'
@@ -24,13 +24,13 @@ repositories {
 }
 
 dependencies {
-  api group: 'org.checkerframework.annotatedlib', name: 'bcel', version: '6.4.1.1'
+  api group: 'org.checkerframework.annotatedlib', name: 'bcel', version: '6.5.0'
   // For a locally-built commons-bcel, set $BCEL and use this line instead of the above.
   // implementation fileTree(dir: "$System.env.BCEL/target", include: 'bcel-6.2.0.2.jar')
 
-  implementation 'org.plumelib:reflection-util:0.2.2'
+  implementation 'org.plumelib:reflection-util:1.0.2'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
@@ -133,6 +133,7 @@ javadoc {
 check.dependsOn javadoc
 
 task javadocWeb(type: Javadoc) {
+  description "Upload API documentation to website."
   source = sourceSets.main.allJava
   destinationDir = file("/cse/web/research/plumelib/${project.name}/api")
   classpath = project.sourceSets.main.compileClasspath
@@ -153,7 +154,7 @@ configurations {
   requireJavadoc
 }
 dependencies {
-  requireJavadoc "org.plumelib:require-javadoc:0.3.1"
+  requireJavadoc "org.plumelib:require-javadoc:1.0.0"
 }
 task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
