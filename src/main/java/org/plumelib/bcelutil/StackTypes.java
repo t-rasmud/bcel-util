@@ -7,12 +7,11 @@ import org.apache.bcel.verifier.structurals.Frame;
 import org.apache.bcel.verifier.structurals.LocalVariables;
 import org.apache.bcel.verifier.structurals.OperandStack;
 import org.apache.bcel.verifier.structurals.UninitializedObjectType;
+import org.checkerframework.checker.determinism.qual.*;
 import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.checker.index.qual.SameLen;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.dataflow.qual.SideEffectFree;
-
-import org.checkerframework.checker.determinism.qual.*;
 
 /**
  * Stores the types on the stack at each instruction (identified by byte code offset) in a method.
@@ -70,14 +69,17 @@ public final class StackTypes {
     return os_arr[offset];
   }
 
-  @SuppressWarnings({"allcheckers:purity", "lock","determinism:argument.type.incompatible"}) // local StringBuilder
+  @SuppressWarnings({
+    "allcheckers:purity",
+    "lock",
+  }) // local StringBuilder
   @SideEffectFree
   @Override
   public String toString(@GuardSatisfied StackTypes this) {
 
     StringBuilder sb = new StringBuilder();
 
-    for (int i = 0; i < os_arr.length; i++) {
+    for (@Det int i = 0; i < os_arr.length; i++) {
       if (os_arr[i] != null) {
         sb.append(String.format("Instruction %d:\n", i));
         sb.append(String.format("  stack:  %s\n", toString(os_arr[i])));
