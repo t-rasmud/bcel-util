@@ -90,7 +90,7 @@ checkerFramework {
     '-Xlint:-processing', // because of Error Prone's "No processor claimed any of these annotations"
     // '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
-    '-AwarnUnneededSuppressions',
+    '-AwarnUnneededSuppressions', '-AwarnUnneededSuppressionsExceptions=purity|method.guarantee.violated',
     '-AsuppressWarnings=determinism:invalid.field.assignment,determinism:invalid.array.assignment,determinism:throw.type.invalid',
     '-AusePolyDefault',
     '-Xmaxerrs','1000'
