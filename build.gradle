@@ -81,7 +81,8 @@ checkerFramework {
     // 'org.checkerframework.checker.nullness.NullnessChecker',
     // 'org.checkerframework.checker.regex.RegexChecker',
     // 'org.checkerframework.checker.signature.SignatureChecker'
-    'org.checkerframework.checker.determinism.DeterminismChecker'
+    'org.checkerframework.checker.determinism.DeterminismChecker',
+    'org.checkerframework.common.util.count.AnnotationStatistics',
   ]
   extraJavacArgs = [
     '-Werror',
