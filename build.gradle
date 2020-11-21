@@ -85,6 +85,7 @@ checkerFramework {
     'org.checkerframework.common.util.count.AnnotationStatistics',
   ]
   extraJavacArgs = [
+    '-Aannotations', '-Anolocations', // for AnnotationStatistics
     '-Werror',
     '-Xlint:-processing', // because of Error Prone's "No processor claimed any of these annotations"
     // '-AcheckPurityAnnotations',
