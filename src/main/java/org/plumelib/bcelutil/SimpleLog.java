@@ -105,7 +105,7 @@ public final class SimpleLog {
   }
 
   /** Increases indentation by one level. */
-  @SuppressWarnings("determinism:unary.increment.type.incompatible")  // Potential true positive: Incrementing PolyDet int: {OrderNonDet Set<Det SimpleLog> st; @NonDet s = st.iterator().next(); st.indent()}
+  // Potential true positive: Incrementing PolyDet int: {OrderNonDet Set<Det SimpleLog> st; @NonDet s = st.iterator().next(); st.indent()}
   public void indent() {
     if (enabled) {
       indentLevel++;
