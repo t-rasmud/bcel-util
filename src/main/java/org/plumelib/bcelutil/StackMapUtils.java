@@ -621,7 +621,7 @@ public abstract class StackMapUtils {
    *
    * @param il instruction list to search
    */
-  @SuppressWarnings("determinism:argument.type.incompatible")  // Iteration over a PolyDet collection for updating
+  @SuppressWarnings({"determinism:argument.type.incompatible","determinism:enhancedfor.type.incompatible"})  // Iteration over a PolyDet collection for updating
   protected final void update_uninitialized_NEW_offsets(InstructionList il) {
 
     il.setPositions();
