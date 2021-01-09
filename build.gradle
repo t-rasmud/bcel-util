@@ -60,7 +60,7 @@ dependencies {
   errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
 }
 tasks.withType(JavaCompile).configureEach {
-  options.compilerArgs << "-Xlint:all" << "-Werror"
+  options.compilerArgs << "-Xlint:all"
   options.errorprone {
     disable("ReferenceEquality") // Use Interning Checker instead.
     // Code copied from BCEL that we don't want to change gratuitously.
@@ -86,7 +86,7 @@ checkerFramework {
   ]
   extraJavacArgs = [
     '-Aannotations', '-Anolocations', // for AnnotationStatistics
-    '-Werror',
+//    '-Werror',
     '-Xlint:-processing', // because of Error Prone's "No processor claimed any of these annotations"
     // '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
@@ -95,7 +95,7 @@ checkerFramework {
     '-AwarnUnneededSuppressionsExceptions=purity|method.guarantee.violated|:deterministic',
     '-AsuppressWarnings=determinism:invalid.field.assignment,determinism:invalid.array.assignment,determinism:throw.type.invalid',
     '-AusePolyDefault',
-    '-Xmaxerrs','1000',
+    '-Xmaxwarns','1000',
           '-Awarns'
   ]
 }
