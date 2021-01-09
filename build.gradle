@@ -95,7 +95,8 @@ checkerFramework {
     '-AwarnUnneededSuppressionsExceptions=purity|method.guarantee.violated|:deterministic',
     '-AsuppressWarnings=determinism:invalid.field.assignment,determinism:invalid.array.assignment,determinism:throw.type.invalid',
     '-AusePolyDefault',
-    '-Xmaxerrs','1000'
+    '-Xmaxerrs','1000',
+          '-Awarns'
   ]
 }
 
